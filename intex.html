@@ -1,0 +1,576 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>едахуйня</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root{
+      --bg:#0b0c10;
+      --card:#12131a;
+      --card2:#151726;
+      --text:#f3f4f6;
+      --muted:#a1a1aa;
+      --border:rgba(255,255,255,.08);
+      --shadow: 0 8px 30px rgba(0,0,0,.35);
+      --accent:#7c3aed; /* фиолетовый-лавка вайб */
+      --ok:#22c55e;
+      --soon:#f59e0b;
+      --bad:#ef4444;
+      --chip:#1b1d2b;
+      --input:#0f111a;
+      --btn:#22243a;
+      --btnText:#f3f4f6;
+    }
+
+    @media (prefers-color-scheme: light){
+      :root{
+        --bg:#f6f7fb;
+        --card:#ffffff;
+        --card2:#ffffff;
+        --text:#0b0c10;
+        --muted:#52525b;
+        --border:rgba(0,0,0,.08);
+        --shadow: 0 10px 30px rgba(0,0,0,.08);
+        --chip:#f1f2f7;
+        --input:#ffffff;
+        --btn:#111827;
+        --btnText:#ffffff;
+      }
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .wrap{
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 14px 14px 28px;
+      padding-bottom: calc(28px + env(safe-area-inset-bottom));
+    }
+
+    .topbar{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
+      margin: 6px 0 14px;
+    }
+    .title{
+      font-weight:800;
+      letter-spacing:-0.02em;
+      font-size: 22px;
+      line-height:1.1;
+      margin:0;
+    }
+    .subtitle{
+      margin-top:6px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background: var(--chip);
+      color: var(--text);
+      font-size: 13px;
+      user-select:none;
+      white-space:nowrap;
+    }
+
+    .grid{
+      display:grid;
+      gap: 12px;
+    }
+
+    .card{
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 14px;
+    }
+
+    .cardHeader{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .cardHeaderLeft{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+    }
+
+    .iconCircle{
+      width:36px;height:36px;border-radius:12px;
+      display:flex;align-items:center;justify-content:center;
+      background: linear-gradient(180deg, rgba(124,58,237,.25), rgba(124,58,237,.05));
+      border:1px solid rgba(124,58,237,.25);
+      flex: 0 0 auto;
+      font-size: 18px;
+    }
+
+    .name{
+      font-weight:700;
+      font-size:16px;
+      margin:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      max-width: 360px;
+    }
+
+    .meta{
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.03);
+      white-space:nowrap;
+    }
+    .pill.ok{border-color: rgba(34,197,94,.35); background: rgba(34,197,94,.10); color: var(--text);}
+    .pill.soon{border-color: rgba(245,158,11,.35); background: rgba(245,158,11,.12); color: var(--text);}
+    .pill.expired{border-color: rgba(239,68,68,.35); background: rgba(239,68,68,.12); color: var(--text);}
+
+    .form{
+      display:grid;
+      gap: 10px;
+    }
+    .row2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    input, select, button{
+      font: inherit;
+      font-size: 16px;
+    }
+    input, select{
+      width:100%;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border:1px solid var(--border);
+      background: var(--input);
+      color: var(--text);
+      outline:none;
+    }
+    input::placeholder{color: rgba(161,161,170,.85)}
+    select{appearance:none}
+    .hint{color: var(--muted); font-size: 12px; margin-top: -2px}
+
+    .btnRow{
+      display:flex;
+      gap:10px;
+      margin-top: 10px;
+    }
+    .btn{
+      width:100%;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--btn);
+      color: var(--btnText);
+      cursor:pointer;
+      font-weight: 700;
+    }
+    .btn.secondary{
+      background: transparent;
+      color: var(--text);
+    }
+    .btn.danger{
+      background: rgba(239,68,68,.14);
+      border-color: rgba(239,68,68,.28);
+      color: var(--text);
+    }
+
+    .listEmpty{
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 14px;
+      text-align:center;
+      padding: 22px 10px;
+      border:1px dashed var(--border);
+      border-radius: 18px;
+    }
+
+    /* Splash */
+    .splash{
+      position:fixed;
+      inset:0;
+      background: radial-gradient(1200px 600px at 20% 10%, rgba(124,58,237,.40), rgba(0,0,0,0)),
+                  radial-gradient(900px 600px at 80% 30%, rgba(34,197,94,.18), rgba(0,0,0,0)),
+                  var(--bg);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:9999;
+      transition: opacity .45s ease, transform .45s ease;
+    }
+    .splash.hide{
+      opacity:0;
+      transform: scale(1.02);
+      pointer-events:none;
+    }
+    .splashCard{
+      width:min(520px, 92vw);
+      border-radius: 26px;
+      border:1px solid var(--border);
+      background: rgba(18,19,26,.65);
+      backdrop-filter: blur(14px);
+      box-shadow: var(--shadow);
+      padding: 22px 18px;
+      text-align:center;
+    }
+    .splashLogo{
+      font-size: 38px;
+      margin-bottom: 10px;
+    }
+    .splashTitle{
+      margin:0;
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing:-0.03em;
+    }
+    .splashSub{
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .tiny{
+      font-size:12px;color:var(--muted);margin-top:10px
+    }
+
+    @media (max-width:520px){
+      .row2{grid-template-columns:1fr}
+      .name{max-width: 220px;}
+    }
+  </style>
+</head>
+<body>
+  <div id="splash" class="splash">
+    <div class="splashCard">
+      <div class="splashLogo">🍽️</div>
+      <h1 class="splashTitle">едахуйня</h1>
+      <div class="splashSub">домашний склад + рецепты (скоро)</div>
+      <div class="tiny" id="splashTiny">Подключаюсь…</div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <h2 class="title">едахуйня</h2>
+        <div id="metaLine" class="subtitle">Загружаю…</div>
+      </div>
+      <div id="modeChip" class="chip">Все продукты</div>
+    </div>
+
+    <div class="card">
+      <div class="cardHeader">
+        <div class="cardHeaderLeft">
+          <div class="iconCircle">➕</div>
+          <div>
+            <div class="name" style="max-width:none">Добавить продукт</div>
+            <div class="meta">Срок с упаковки или “после вскрытия”</div>
+          </div>
+        </div>
+        <span class="pill" title="Авто-категория по названию">🤖 авто</span>
+      </div>
+
+      <div class="form">
+        <input id="name" placeholder="Например: молоко, курица, яйца" />
+
+        <div class="row2">
+          <input id="qty" placeholder="Количество" inputmode="decimal" />
+          <input id="unit" placeholder="Ед. (г, мл, шт, л)" />
+        </div>
+
+        <div class="row2">
+          <div>
+            <div class="hint">Срок годности (с упаковки)</div>
+            <input id="expiry" type="date" />
+          </div>
+          <div>
+            <div class="hint">Дата вскрытия</div>
+            <input id="opened" type="date" />
+          </div>
+        </div>
+
+        <div class="row2">
+          <input id="openedDays" placeholder="После вскрытия (дней)" inputmode="numeric" />
+          <select id="storage">
+            <option value="">Где хранится (авто)</option>
+            <option value="fridge">Холодильник</option>
+            <option value="freezer">Морозилка</option>
+            <option value="pantry">Кладовка</option>
+          </select>
+        </div>
+
+        <div class="row2">
+          <select id="category">
+            <option value="">Категория (авто)</option>
+            <option value="ready">🍱 Готовое</option>
+            <option value="veggies">🥦 Овощи/фрукты</option>
+            <option value="dairy">🥛 Молочка</option>
+            <option value="bakery">🍞 Хлеб</option>
+            <option value="sweet">🍫 Сладкое/снэки</option>
+            <option value="meat">🥩 Мясо/птица</option>
+            <option value="eggs">🥚 Яйца</option>
+            <option value="frozen">🧊 Заморозка</option>
+            <option value="canned">🥫 Консервы</option>
+            <option value="grocery">🍚 Бакалея</option>
+            <option value="other">🧺 Другое</option>
+          </select>
+          <input id="kcal" placeholder="ккал на 100 (необязательно)" inputmode="numeric" />
+        </div>
+
+        <input id="notes" placeholder="Заметка (необязательно)" />
+
+        <button id="addBtn" class="btn">Добавить</button>
+        <div class="hint">Если указал “вскрыто” + дни — “использовать до” считается от вскрытия.</div>
+      </div>
+    </div>
+
+    <div class="btnRow">
+      <button id="reloadBtn" class="btn secondary">Обновить</button>
+      <button id="soonBtn" class="btn secondary">Срочное</button>
+    </div>
+
+    <div id="list" class="grid" style="margin-top:12px"></div>
+  </div>
+
+<script>
+  const tg = window.Telegram?.WebApp;
+  if (tg) { tg.ready(); tg.expand(); }
+
+  // === ТВОЙ Apps Script API ===
+  const API_URL = "https://script.google.com/macros/s/AKfycbzNsQL2tIakYQlInJ1VWZhmh2a5bSAChOP8oLysFxFsI8BKgHBc8d4ejH0fI4BrMpCr/exec";
+
+  // user_id только из Telegram. (Если открыл в браузере — будет пусто)
+  const USER_ID = tg?.initDataUnsafe?.user?.id ? String(tg.initDataUnsafe.user.id) : "";
+
+  let filterSoon = false;
+  let cachedMeta = null;
+
+  function esc(s){
+    return String(s ?? "").replace(/[&<>"']/g, m => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"
+    }[m]));
+  }
+
+  function fmtDate(iso){
+    if (!iso) return "—";
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return String(iso);
+    // показываем в локали пользователя (айфон/браузер)
+    return d.toLocaleDateString("ru-RU");
+  }
+
+  function statusRu(status){
+    if (status === "ok") return "Ок";
+    if (status === "soon") return "Скоро";
+    if (status === "expired") return "Просрочено";
+    return "";
+  }
+
+  function statusPill(status){
+    const t = statusRu(status);
+    if (!t) return "";
+    return `<span class="pill ${esc(status)}">${t}</span>`;
+  }
+
+  function catIcon(cat){
+    const map = {
+      ready:"🍱", veggies:"🥦", dairy:"🥛", bakery:"🍞", sweet:"🍫",
+      meat:"🥩", eggs:"🥚", frozen:"🧊", canned:"🥫", grocery:"🍚", other:"🧺"
+    };
+    return map[cat] || "🧺";
+  }
+
+  async function apiPost(payload){
+    // IMPORTANT: text/plain чтобы не было preflight
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload),
+    });
+    return await res.json();
+  }
+
+  async function apiGet(params){
+    const url = new URL(API_URL);
+    Object.entries(params).forEach(([k,v]) => url.searchParams.set(k,v));
+    const res = await fetch(url.toString());
+    return await res.json();
+  }
+
+  function itemHtml(i){
+    const icon = catIcon(i.category);
+    const name = esc(i.name || "");
+    const qty = i.qty ? esc(i.qty) : "—";
+    const unit = i.unit ? esc(i.unit) : "";
+    const storageRu = i.storage === "freezer" ? "Морозилка" : i.storage === "pantry" ? "Кладовка" : "Холодильник";
+
+    const useBy = fmtDate(i.use_by_date || i.expiry_date);
+
+    return `
+      <div class="card">
+        <div class="cardHeader">
+          <div class="cardHeaderLeft">
+            <div class="iconCircle">${icon}</div>
+            <div style="min-width:0">
+              <div class="name">${name}</div>
+              <div class="meta">${qty}${unit ? " " + unit : ""} • ${esc(storageRu)}</div>
+            </div>
+          </div>
+          ${statusPill(i.status)}
+        </div>
+
+        <div class="meta">Использовать до: <b>${esc(useBy)}</b></div>
+        ${i.opened_date ? `<div class="meta">Вскрыто: ${esc(fmtDate(i.opened_date))}${i.opened_days ? ` • после вскрытия: ${esc(i.opened_days)} дн.` : ""}</div>` : ``}
+        ${i.notes ? `<div class="meta" style="margin-top:6px">${esc(i.notes)}</div>` : ``}
+
+        <div class="btnRow">
+          <button class="btn" onclick="eatItem('${esc(i.id)}')">Съели</button>
+          <button class="btn danger" onclick="delItem('${esc(i.id)}')">Удалить</button>
+        </div>
+      </div>
+    `;
+  }
+
+  async function load(){
+    const chip = document.getElementById("modeChip");
+    chip.textContent = filterSoon ? "Только срочное" : "Все продукты";
+
+    if (!USER_ID){
+      document.getElementById("metaLine").textContent = "Открой в Telegram, чтобы работало. В браузере доступ закрыт.";
+      document.getElementById("list").innerHTML = `<div class="listEmpty">Открой мини-приложение в Telegram.</div>`;
+      hideSplash("Открыто не в Telegram");
+      return;
+    }
+
+    // list
+    const data = await apiGet({ action: "list", user_id: USER_ID });
+    if (!data.ok){
+      document.getElementById("metaLine").textContent = data.error || "Ошибка доступа";
+      document.getElementById("list").innerHTML = `<div class="listEmpty">${esc(data.error || "Ошибка")}</div>`;
+      hideSplash("Ошибка доступа");
+      return;
+    }
+
+    cachedMeta = data.meta || null;
+    document.getElementById("metaLine").textContent =
+      `Скоро: ≤ ${data.meta?.notify_soon_day ?? 2} дн. • История: ${data.meta?.history_days ?? 7} дн.`;
+
+    const items = Array.isArray(data.items) ? data.items : [];
+    const view = filterSoon ? items.filter(i => i.status === "soon" || i.status === "expired") : items;
+
+    document.getElementById("list").innerHTML =
+      view.length ? view.map(itemHtml).join("") : `<div class="listEmpty">Пока пусто. Добавь что-нибудь 🍶</div>`;
+
+    hideSplash("Готово");
+  }
+
+  async function add(){
+    if (!USER_ID) return tg?.showAlert?.("Открой в Telegram");
+
+    const name = document.getElementById("name").value.trim();
+    const qty = document.getElementById("qty").value.trim();
+    const unit = document.getElementById("unit").value.trim();
+
+    const expiry_date = document.getElementById("expiry").value;
+    const opened_date = document.getElementById("opened").value;
+    const opened_days = document.getElementById("openedDays").value.trim();
+
+    const storage = document.getElementById("storage").value;
+    const category = document.getElementById("category").value;
+
+    const kcal_per_100 = document.getElementById("kcal").value.trim();
+    const notes = document.getElementById("notes").value.trim();
+
+    if (!name) return tg?.showAlert?.("Введите продукт");
+    if (!expiry_date && !opened_date) return tg?.showAlert?.("Укажи срок годности или дату вскрытия");
+
+    const res = await apiPost({
+      action: "add",
+      user_id: USER_ID,
+      item: {
+        name, qty, unit,
+        category, storage,
+        expiry_date, opened_date, opened_days,
+        kcal_per_100, notes
+      }
+    });
+
+    if (!res.ok) return tg?.showAlert?.(res.error || "Ошибка добавления");
+
+    // reset
+    ["name","qty","unit","expiry","opened","openedDays","kcal","notes"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = "";
+    });
+    document.getElementById("storage").value = "";
+    document.getElementById("category").value = "";
+
+    await load();
+  }
+
+  window.eatItem = async function(id){
+    if (!USER_ID) return;
+    const res = await apiPost({ action: "eat", user_id: USER_ID, id });
+    if (!res.ok) tg?.showAlert?.(res.error || "Не получилось отметить как съедено");
+    await load();
+  }
+
+  window.delItem = async function(id){
+    if (!USER_ID) return;
+    const ok = confirm("Точно удалить? Лучше жми «Съели» 🙂");
+    if (!ok) return;
+    const res = await apiPost({ action: "delete", user_id: USER_ID, id });
+    if (!res.ok) tg?.showAlert?.(res.error || "Ошибка удаления");
+    await load();
+  }
+
+  function hideSplash(msg){
+    const tiny = document.getElementById("splashTiny");
+    if (tiny && msg) tiny.textContent = msg;
+    // чуть задержки, чтобы выглядело как заставка
+    setTimeout(() => {
+      const sp = document.getElementById("splash");
+      if (sp) sp.classList.add("hide");
+    }, 450);
+  }
+
+  document.getElementById("addBtn").onclick = add;
+  document.getElementById("reloadBtn").onclick = load;
+  document.getElementById("soonBtn").onclick = () => { filterSoon = !filterSoon; load(); };
+  document.getElementById("modeChip").onclick = () => { filterSoon = !filterSoon; load(); };
+
+  load();
+</script>
+</body>
+</html>
