@@ -2,379 +2,183 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>едахуйня</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>едахуйня — склад</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
   <style>
     :root{
-      --bg:#0b0c10;
-      --card:#12131a;
-      --card2:#151726;
-      --text:#f3f4f6;
-      --muted:#a1a1aa;
-      --border:rgba(255,255,255,.08);
-      --shadow: 0 8px 30px rgba(0,0,0,.35);
-      --accent:#7c3aed; /* фиолетовый-лавка вайб */
-      --ok:#22c55e;
-      --soon:#f59e0b;
-      --bad:#ef4444;
-      --chip:#1b1d2b;
-      --input:#0f111a;
-      --btn:#22243a;
-      --btnText:#f3f4f6;
+      --bg:#0b0d10;
+      --card:#12151b;
+      --text:#e8eef8;
+      --muted:rgba(232,238,248,.65);
+      --stroke:rgba(232,238,248,.12);
+      --chip:rgba(232,238,248,.08);
+      --ok:#2ecc71;
+      --soon:#f1c40f;
+      --expired:#ff4d4f;
+      --btn:#1e2530;
+      --btn2:#223042;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius:18px;
     }
 
-    @media (prefers-color-scheme: light){
-      :root{
-        --bg:#f6f7fb;
-        --card:#ffffff;
-        --card2:#ffffff;
-        --text:#0b0c10;
-        --muted:#52525b;
-        --border:rgba(0,0,0,.08);
-        --shadow: 0 10px 30px rgba(0,0,0,.08);
-        --chip:#f1f2f7;
-        --input:#ffffff;
-        --btn:#111827;
-        --btnText:#ffffff;
-      }
-    }
+    /* если откроют в светлой среде — всё равно держим тёмную,
+       потом на следующем этапе сделаем переключатель как в Лавке */
+    html,body{background:var(--bg); color:var(--text);}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; margin:16px;}
 
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial;
-      background: var(--bg);
-      color: var(--text);
-    }
+    h2{margin:0 0 6px 0; font-size:20px; letter-spacing:.2px;}
+    .meta{color:var(--muted); font-size:13px; line-height:1.35;}
 
-    .wrap{
-      max-width: 720px;
-      margin: 0 auto;
-      padding: 14px 14px 28px;
-      padding-bottom: calc(28px + env(safe-area-inset-bottom));
-    }
-
-    .topbar{
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      gap:12px;
-      margin: 6px 0 14px;
-    }
-    .title{
-      font-weight:800;
-      letter-spacing:-0.02em;
-      font-size: 22px;
-      line-height:1.1;
-      margin:0;
-    }
-    .subtitle{
-      margin-top:6px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .chip{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 12px;
-      border-radius:999px;
-      border:1px solid var(--border);
-      background: var(--chip);
-      color: var(--text);
-      font-size: 13px;
-      user-select:none;
-      white-space:nowrap;
-    }
-
-    .grid{
-      display:grid;
-      gap: 12px;
-    }
+    .topbar{display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:12px;}
+    .chip{padding:8px 12px; background:var(--chip); border:1px solid var(--stroke); border-radius:999px; font-size:13px; color:var(--muted);}
 
     .card{
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 18px;
+      background:var(--card);
+      border:1px solid var(--stroke);
+      border-radius:var(--radius);
+      padding:14px;
+      margin:12px 0;
       box-shadow: var(--shadow);
-      padding: 14px;
     }
 
-    .cardHeader{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-    .cardHeaderLeft{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      min-width:0;
-    }
+    .grid2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+    .grid3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;}
 
-    .iconCircle{
-      width:36px;height:36px;border-radius:12px;
-      display:flex;align-items:center;justify-content:center;
-      background: linear-gradient(180deg, rgba(124,58,237,.25), rgba(124,58,237,.05));
-      border:1px solid rgba(124,58,237,.25);
-      flex: 0 0 auto;
-      font-size: 18px;
-    }
-
-    .name{
-      font-weight:700;
+    input, select, button{
+      width:100%;
+      padding:12px;
+      margin:6px 0;
+      border:1px solid var(--stroke);
+      border-radius:14px;
       font-size:16px;
-      margin:0;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      white-space:nowrap;
-      max-width: 360px;
+      background:#0e1218;
+      color:var(--text);
+      outline:none;
     }
-
-    .meta{
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.35;
+    input::placeholder{color:rgba(232,238,248,.35);}
+    button{
+      border:0;
+      background:var(--btn);
+      cursor:pointer;
+      transition:.15s ease;
     }
+    button:hover{transform:translateY(-1px); background:var(--btn2);}
+    button.primary{background:#2a3b55;}
+    button.primary:hover{background:#314a6e;}
+    button.danger{background:#3a1f22;}
+    button.danger:hover{background:#4a262a;}
 
+    .actionsRow{display:flex; gap:10px; margin-top:10px;}
+    .actionsRow button{margin:0;}
+
+    .rowTitle{display:flex; align-items:center; gap:10px;}
+    .name{font-weight:700; font-size:16px;}
     .pill{
       display:inline-flex;
       align-items:center;
-      gap:6px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,.03);
-      white-space:nowrap;
+      padding:4px 10px;
+      border-radius:999px;
+      font-size:12px;
+      border:1px solid var(--stroke);
+      color:var(--muted);
+      background:rgba(232,238,248,.05);
     }
-    .pill.ok{border-color: rgba(34,197,94,.35); background: rgba(34,197,94,.10); color: var(--text);}
-    .pill.soon{border-color: rgba(245,158,11,.35); background: rgba(245,158,11,.12); color: var(--text);}
-    .pill.expired{border-color: rgba(239,68,68,.35); background: rgba(239,68,68,.12); color: var(--text);}
+    .pill.ok{border-color:rgba(46,204,113,.35); color:rgba(46,204,113,.9); background:rgba(46,204,113,.08);}
+    .pill.soon{border-color:rgba(241,196,15,.35); color:rgba(241,196,15,.95); background:rgba(241,196,15,.08);}
+    .pill.expired{border-color:rgba(255,77,79,.35); color:rgba(255,77,79,.95); background:rgba(255,77,79,.10);}
 
-    .form{
-      display:grid;
-      gap: 10px;
-    }
-    .row2{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-    input, select, button{
-      font: inherit;
-      font-size: 16px;
-    }
-    input, select{
-      width:100%;
-      padding: 12px 12px;
-      border-radius: 14px;
-      border:1px solid var(--border);
-      background: var(--input);
-      color: var(--text);
-      outline:none;
-    }
-    input::placeholder{color: rgba(161,161,170,.85)}
-    select{appearance:none}
-    .hint{color: var(--muted); font-size: 12px; margin-top: -2px}
+    .subline{color:var(--muted); font-size:13px; margin-top:6px;}
+    .subline b{color:var(--text);}
 
-    .btnRow{
-      display:flex;
-      gap:10px;
-      margin-top: 10px;
-    }
-    .btn{
-      width:100%;
-      padding: 12px 14px;
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      background: var(--btn);
-      color: var(--btnText);
-      cursor:pointer;
-      font-weight: 700;
-    }
-    .btn.secondary{
-      background: transparent;
-      color: var(--text);
-    }
-    .btn.danger{
-      background: rgba(239,68,68,.14);
-      border-color: rgba(239,68,68,.28);
-      color: var(--text);
-    }
+    .sep{height:1px; background:var(--stroke); margin:10px 0;}
+    .empty{color:var(--muted); margin-top:14px;}
 
-    .listEmpty{
-      margin-top: 14px;
-      color: var(--muted);
-      font-size: 14px;
-      text-align:center;
-      padding: 22px 10px;
-      border:1px dashed var(--border);
-      border-radius: 18px;
-    }
-
-    /* Splash */
-    .splash{
-      position:fixed;
-      inset:0;
-      background: radial-gradient(1200px 600px at 20% 10%, rgba(124,58,237,.40), rgba(0,0,0,0)),
-                  radial-gradient(900px 600px at 80% 30%, rgba(34,197,94,.18), rgba(0,0,0,0)),
-                  var(--bg);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      z-index:9999;
-      transition: opacity .45s ease, transform .45s ease;
-    }
-    .splash.hide{
-      opacity:0;
-      transform: scale(1.02);
-      pointer-events:none;
-    }
-    .splashCard{
-      width:min(520px, 92vw);
-      border-radius: 26px;
-      border:1px solid var(--border);
-      background: rgba(18,19,26,.65);
-      backdrop-filter: blur(14px);
-      box-shadow: var(--shadow);
-      padding: 22px 18px;
-      text-align:center;
-    }
-    .splashLogo{
-      font-size: 38px;
-      margin-bottom: 10px;
-    }
-    .splashTitle{
-      margin:0;
-      font-size: 26px;
-      font-weight: 900;
-      letter-spacing:-0.03em;
-    }
-    .splashSub{
-      margin-top: 8px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-    .tiny{
-      font-size:12px;color:var(--muted);margin-top:10px
-    }
-
-    @media (max-width:520px){
-      .row2{grid-template-columns:1fr}
-      .name{max-width: 220px;}
+    /* компактнее на очень узких */
+    @media (max-width: 380px){
+      body{margin:12px}
+      .grid2,.grid3{grid-template-columns:1fr}
     }
   </style>
 </head>
+
 <body>
-  <div id="splash" class="splash">
-    <div class="splashCard">
-      <div class="splashLogo">🍽️</div>
-      <h1 class="splashTitle">едахуйня</h1>
-      <div class="splashSub">домашний склад + рецепты (скоро)</div>
-      <div class="tiny" id="splashTiny">Подключаюсь…</div>
+  <div class="topbar">
+    <div>
+      <h2>Онлайн-склад</h2>
+      <div id="metaLine" class="meta">Загружаю…</div>
     </div>
+    <div id="modeChip" class="chip">Показать всё</div>
   </div>
 
-  <div class="wrap">
-    <div class="topbar">
+  <div class="card">
+    <div class="meta" style="margin-bottom:6px;">Добавить продукт</div>
+
+    <input id="name" placeholder="Название (например: молоко)" />
+
+    <div class="grid2">
+      <input id="qty" placeholder="Количество" inputmode="decimal" />
+      <input id="unit" placeholder="Ед. (л / шт / г)" />
+    </div>
+
+    <div class="grid2">
       <div>
-        <h2 class="title">едахуйня</h2>
-        <div id="metaLine" class="subtitle">Загружаю…</div>
+        <div class="meta">Срок годности (с упаковки)</div>
+        <input id="expiry_date" type="date" />
       </div>
-      <div id="modeChip" class="chip">Все продукты</div>
-    </div>
-
-    <div class="card">
-      <div class="cardHeader">
-        <div class="cardHeaderLeft">
-          <div class="iconCircle">➕</div>
-          <div>
-            <div class="name" style="max-width:none">Добавить продукт</div>
-            <div class="meta">Срок с упаковки или “после вскрытия”</div>
-          </div>
-        </div>
-        <span class="pill" title="Авто-категория по названию">🤖 авто</span>
-      </div>
-
-      <div class="form">
-        <input id="name" placeholder="Например: молоко, курица, яйца" />
-
-        <div class="row2">
-          <input id="qty" placeholder="Количество" inputmode="decimal" />
-          <input id="unit" placeholder="Ед. (г, мл, шт, л)" />
-        </div>
-
-        <div class="row2">
-          <div>
-            <div class="hint">Срок годности (с упаковки)</div>
-            <input id="expiry" type="date" />
-          </div>
-          <div>
-            <div class="hint">Дата вскрытия</div>
-            <input id="opened" type="date" />
-          </div>
-        </div>
-
-        <div class="row2">
-          <input id="openedDays" placeholder="После вскрытия (дней)" inputmode="numeric" />
-          <select id="storage">
-            <option value="">Где хранится (авто)</option>
-            <option value="fridge">Холодильник</option>
-            <option value="freezer">Морозилка</option>
-            <option value="pantry">Кладовка</option>
-          </select>
-        </div>
-
-        <div class="row2">
-          <select id="category">
-            <option value="">Категория (авто)</option>
-            <option value="ready">🍱 Готовое</option>
-            <option value="veggies">🥦 Овощи/фрукты</option>
-            <option value="dairy">🥛 Молочка</option>
-            <option value="bakery">🍞 Хлеб</option>
-            <option value="sweet">🍫 Сладкое/снэки</option>
-            <option value="meat">🥩 Мясо/птица</option>
-            <option value="eggs">🥚 Яйца</option>
-            <option value="frozen">🧊 Заморозка</option>
-            <option value="canned">🥫 Консервы</option>
-            <option value="grocery">🍚 Бакалея</option>
-            <option value="other">🧺 Другое</option>
-          </select>
-          <input id="kcal" placeholder="ккал на 100 (необязательно)" inputmode="numeric" />
-        </div>
-
-        <input id="notes" placeholder="Заметка (необязательно)" />
-
-        <button id="addBtn" class="btn">Добавить</button>
-        <div class="hint">Если указал “вскрыто” + дни — “использовать до” считается от вскрытия.</div>
+      <div>
+        <div class="meta">Дата вскрытия</div>
+        <input id="opened_date" type="date" />
       </div>
     </div>
 
-    <div class="btnRow">
-      <button id="reloadBtn" class="btn secondary">Обновить</button>
-      <button id="soonBtn" class="btn secondary">Срочное</button>
+    <div class="grid2">
+      <input id="opened_days" placeholder="Годен после вскрытия (дней)" inputmode="numeric" />
+      <input id="kcal" placeholder="ккал / 100г (опц.)" inputmode="decimal" />
     </div>
 
-    <div id="list" class="grid" style="margin-top:12px"></div>
+    <input id="notes" placeholder="Заметка (опционально)" />
+
+    <button id="addBtn" class="primary">Добавить</button>
+
+    <div class="meta" style="margin-top:8px;">
+      Если указал <b>дату вскрытия</b> + <b>дни</b> — “Использовать до” считается от вскрытия.
+    </div>
   </div>
+
+  <div class="actionsRow">
+    <button id="reloadBtn">Обновить</button>
+    <button id="soonBtn">Скоро/Просрочено</button>
+  </div>
+
+  <div id="list"></div>
 
 <script>
   const tg = window.Telegram?.WebApp;
-  if (tg) { tg.ready(); tg.expand(); }
+  try { tg?.ready(); tg?.expand(); } catch(e){}
 
-  // === ТВОЙ Apps Script API ===
-  const API_URL = "https://script.google.com/macros/s/AKfycbzNsQL2tIakYQlInJ1VWZhmh2a5bSAChOP8oLysFxFsI8BKgHBc8d4ejH0fI4BrMpCr/exec";
-
-  // user_id только из Telegram. (Если открыл в браузере — будет пусто)
-  const USER_ID = tg?.initDataUnsafe?.user?.id ? String(tg.initDataUnsafe.user.id) : "";
+  // === ТВОЙ Apps Script WebApp URL (exec) ===
+  const API_URL = "https://script.google.com/macros/s/AKfycbwk0uyNVcv8Hx7dtP3B7CgDx2Aa5ixagj56FyfAwSWxM0ZUbY5bZoQK_2RDCdHoW5UO/exec";
 
   let filterSoon = false;
-  let cachedMeta = null;
+
+  // user_id для авторизации
+  function getUserId(){
+    const tgId = tg?.initDataUnsafe?.user?.id ? String(tg.initDataUnsafe.user.id) : "";
+    // если открыли вне телеги — попросим один раз
+    if (tgId) return tgId;
+
+    const saved = localStorage.getItem("edahuyna_uid") || "";
+    if (saved) return saved;
+
+    const manual = prompt("Введите ваш Telegram user_id (для доступа):", "");
+    if (manual && String(manual).trim()) {
+      localStorage.setItem("edahuyna_uid", String(manual).trim());
+      return String(manual).trim();
+    }
+    return "";
+  }
 
   function esc(s){
     return String(s ?? "").replace(/[&<>"']/g, m => ({
@@ -382,12 +186,14 @@
     }[m]));
   }
 
-  function fmtDate(iso){
+  function isoToRuDate(iso){
     if (!iso) return "—";
-    const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return String(iso);
-    // показываем в локали пользователя (айфон/браузер)
-    return d.toLocaleDateString("ru-RU");
+    const d = new Date(String(iso));
+    if (isNaN(d.getTime())) return esc(iso);
+    const dd = String(d.getDate()).padStart(2,"0");
+    const mm = String(d.getMonth()+1).padStart(2,"0");
+    const yy = d.getFullYear();
+    return `${dd}.${mm}.${yy}`;
   }
 
   function statusRu(status){
@@ -400,26 +206,25 @@
   function statusPill(status){
     const t = statusRu(status);
     if (!t) return "";
-    return `<span class="pill ${esc(status)}">${t}</span>`;
+    return `<span class="pill ${esc(status)}">${esc(t)}</span>`;
   }
 
-  function catIcon(cat){
-    const map = {
-      ready:"🍱", veggies:"🥦", dairy:"🥛", bakery:"🍞", sweet:"🍫",
-      meat:"🥩", eggs:"🥚", frozen:"🧊", canned:"🥫", grocery:"🍚", other:"🧺"
-    };
-    return map[cat] || "🧺";
-  }
+  const CAT = {
+    ready:{label:"Готовое", icon:"🍱"},
+    veggies:{label:"Овощи/фрукты", icon:"🥬"},
+    dairy:{label:"Молочка", icon:"🥛"},
+    bakery:{label:"Хлеб", icon:"🍞"},
+    sweet:{label:"Сладкое/снэки", icon:"🍫"},
+    meat:{label:"Мясо/птица", icon:"🥩"},
+    eggs:{label:"Яйца", icon:"🥚"},
+    frozen:{label:"Заморозка", icon:"🧊"},
+    canned:{label:"Консервы", icon:"🥫"},
+    grocery:{label:"Бакалея", icon:"🍚"},
+    other:{label:"Другое", icon:"🧺"},
+  };
 
-  async function apiPost(payload){
-    // IMPORTANT: text/plain чтобы не было preflight
-    const res = await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify(payload),
-    });
-    return await res.json();
-  }
+  function catIcon(key){ return (CAT[key]?.icon) || "🧺"; }
+  function catLabel(key){ return (CAT[key]?.label) || "Другое"; }
 
   async function apiGet(params){
     const url = new URL(API_URL);
@@ -428,147 +233,137 @@
     return await res.json();
   }
 
-  function itemHtml(i){
-    const icon = catIcon(i.category);
-    const name = esc(i.name || "");
-    const qty = i.qty ? esc(i.qty) : "—";
-    const unit = i.unit ? esc(i.unit) : "";
-    const storageRu = i.storage === "freezer" ? "Морозилка" : i.storage === "pantry" ? "Кладовка" : "Холодильник";
+  async function apiPost(payload){
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" }, // важно для GAS
+      body: JSON.stringify(payload),
+    });
+    return await res.json();
+  }
 
-    const useBy = fmtDate(i.use_by_date || i.expiry_date);
+  function itemHtml(i){
+    const title = `${catIcon(i.category)} ${esc(i.name || "")}`;
+    const qtyLine = `Кол-во: <b>${esc(i.qty || "—")} ${esc(i.unit || "")}</b>`;
+    const useBy = isoToRuDate(i.use_by_date);
+    const exp = i.expiry_date ? isoToRuDate(i.expiry_date) : "—";
+    const opened = i.opened_date ? isoToRuDate(i.opened_date) : "";
+    const openedDays = i.opened_days ? `${esc(i.opened_days)} дн.` : "";
+    const storage = i.storage ? esc(i.storage) : "";
+
+    const extra = [];
+    if (opened) extra.push(`Вскрыто: <b>${opened}</b>`);
+    if (openedDays) extra.push(`После вскрытия: <b>${openedDays}</b>`);
+    if (storage) extra.push(`Хранение: <b>${storage}</b>`);
+    if (i.kcal_per_100) extra.push(`ккал/100: <b>${esc(i.kcal_per_100)}</b>`);
+    if (i.notes) extra.push(`Заметка: <b>${esc(i.notes)}</b>`);
 
     return `
       <div class="card">
-        <div class="cardHeader">
-          <div class="cardHeaderLeft">
-            <div class="iconCircle">${icon}</div>
-            <div style="min-width:0">
-              <div class="name">${name}</div>
-              <div class="meta">${qty}${unit ? " " + unit : ""} • ${esc(storageRu)}</div>
-            </div>
-          </div>
+        <div class="rowTitle">
+          <div class="name">${title}</div>
           ${statusPill(i.status)}
         </div>
 
-        <div class="meta">Использовать до: <b>${esc(useBy)}</b></div>
-        ${i.opened_date ? `<div class="meta">Вскрыто: ${esc(fmtDate(i.opened_date))}${i.opened_days ? ` • после вскрытия: ${esc(i.opened_days)} дн.` : ""}</div>` : ``}
-        ${i.notes ? `<div class="meta" style="margin-top:6px">${esc(i.notes)}</div>` : ``}
+        <div class="subline">${qtyLine}</div>
+        <div class="subline">Категория: <b>${esc(catLabel(i.category))}</b></div>
+        <div class="subline">Использовать до: <b>${useBy}</b> <span class="meta">(с упаковки: ${exp})</span></div>
 
-        <div class="btnRow">
-          <button class="btn" onclick="eatItem('${esc(i.id)}')">Съели</button>
-          <button class="btn danger" onclick="delItem('${esc(i.id)}')">Удалить</button>
+        ${extra.length ? `<div class="sep"></div><div class="subline">${extra.join(" • ")}</div>` : ``}
+
+        <div class="actionsRow" style="margin-top:12px;">
+          <button class="danger" onclick="eatItem('${esc(i.id)}')">Съели</button>
         </div>
       </div>
     `;
   }
 
   async function load(){
-    const chip = document.getElementById("modeChip");
-    chip.textContent = filterSoon ? "Только срочное" : "Все продукты";
-
-    if (!USER_ID){
-      document.getElementById("metaLine").textContent = "Открой в Telegram, чтобы работало. В браузере доступ закрыт.";
-      document.getElementById("list").innerHTML = `<div class="listEmpty">Открой мини-приложение в Telegram.</div>`;
-      hideSplash("Открыто не в Telegram");
+    const uid = getUserId();
+    if (!uid) {
+      document.getElementById("metaLine").textContent = "Нет user_id — доступ не проверить.";
+      document.getElementById("list").innerHTML = `<div class="empty">Открой через Telegram или введи user_id.</div>`;
       return;
     }
 
-    // list
-    const data = await apiGet({ action: "list", user_id: USER_ID });
-    if (!data.ok){
-      document.getElementById("metaLine").textContent = data.error || "Ошибка доступа";
-      document.getElementById("list").innerHTML = `<div class="listEmpty">${esc(data.error || "Ошибка")}</div>`;
-      hideSplash("Ошибка доступа");
+    const data = await apiGet({ action: "list", user_id: uid });
+
+    if (!data || !data.ok){
+      const err = data?.error ? String(data.error) : "Ошибка API";
+      document.getElementById("metaLine").textContent = err;
+      document.getElementById("list").innerHTML = `<div class="empty">${esc(err)}</div>`;
       return;
     }
-
-    cachedMeta = data.meta || null;
-    document.getElementById("metaLine").textContent =
-      `Скоро: ≤ ${data.meta?.notify_soon_day ?? 2} дн. • История: ${data.meta?.history_days ?? 7} дн.`;
 
     const items = Array.isArray(data.items) ? data.items : [];
-    const view = filterSoon ? items.filter(i => i.status === "soon" || i.status === "expired") : items;
+    const meta = data.meta || {};
+    document.getElementById("metaLine").textContent =
+      `${meta.app_name || "едахуйня"} • TZ: ${meta.tz || "—"} • “Скоро” ≤ ${meta.notify_soon_day ?? "—"} дн.`;
 
+    const view = filterSoon
+      ? items.filter(i => i.status === "soon" || i.status === "expired")
+      : items;
+
+    document.getElementById("modeChip").textContent = filterSoon ? "Только срочное" : "Показать всё";
     document.getElementById("list").innerHTML =
-      view.length ? view.map(itemHtml).join("") : `<div class="listEmpty">Пока пусто. Добавь что-нибудь 🍶</div>`;
-
-    hideSplash("Готово");
+      view.length ? view.map(itemHtml).join("") : `<div class="empty">Пока пусто.</div>`;
   }
 
   async function add(){
-    if (!USER_ID) return tg?.showAlert?.("Открой в Telegram");
+    const uid = getUserId();
+    if (!uid) return alert("Нет user_id");
 
     const name = document.getElementById("name").value.trim();
     const qty = document.getElementById("qty").value.trim();
     const unit = document.getElementById("unit").value.trim();
-
-    const expiry_date = document.getElementById("expiry").value;
-    const opened_date = document.getElementById("opened").value;
-    const opened_days = document.getElementById("openedDays").value.trim();
-
-    const storage = document.getElementById("storage").value;
-    const category = document.getElementById("category").value;
-
+    const expiry_date = document.getElementById("expiry_date").value; // YYYY-MM-DD
+    const opened_date = document.getElementById("opened_date").value; // YYYY-MM-DD
+    const opened_days = document.getElementById("opened_days").value.trim();
     const kcal_per_100 = document.getElementById("kcal").value.trim();
     const notes = document.getElementById("notes").value.trim();
 
-    if (!name) return tg?.showAlert?.("Введите продукт");
-    if (!expiry_date && !opened_date) return tg?.showAlert?.("Укажи срок годности или дату вскрытия");
+    if (!name) return (tg?.showAlert ? tg.showAlert("Введите название") : alert("Введите название"));
+    if (!expiry_date && !opened_date) return (tg?.showAlert ? tg.showAlert("Укажите срок годности или дату вскрытия") : alert("Укажите срок годности или дату вскрытия"));
 
     const res = await apiPost({
+      user_id: uid,
       action: "add",
-      user_id: USER_ID,
-      item: {
-        name, qty, unit,
-        category, storage,
-        expiry_date, opened_date, opened_days,
-        kcal_per_100, notes
-      }
+      item: { name, qty, unit, expiry_date, opened_date, opened_days, kcal_per_100, notes }
     });
 
-    if (!res.ok) return tg?.showAlert?.(res.error || "Ошибка добавления");
+    if (!res || !res.ok){
+      const err = res?.error ? String(res.error) : "Ошибка добавления";
+      return (tg?.showAlert ? tg.showAlert(err) : alert(err));
+    }
 
     // reset
-    ["name","qty","unit","expiry","opened","openedDays","kcal","notes"].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.value = "";
-    });
-    document.getElementById("storage").value = "";
-    document.getElementById("category").value = "";
+    document.getElementById("name").value = "";
+    document.getElementById("qty").value = "";
+    document.getElementById("unit").value = "";
+    document.getElementById("expiry_date").value = "";
+    document.getElementById("opened_date").value = "";
+    document.getElementById("opened_days").value = "";
+    document.getElementById("kcal").value = "";
+    document.getElementById("notes").value = "";
 
     await load();
   }
 
   window.eatItem = async function(id){
-    if (!USER_ID) return;
-    const res = await apiPost({ action: "eat", user_id: USER_ID, id });
-    if (!res.ok) tg?.showAlert?.(res.error || "Не получилось отметить как съедено");
-    await load();
-  }
+    const uid = getUserId();
+    if (!uid) return;
 
-  window.delItem = async function(id){
-    if (!USER_ID) return;
-    const ok = confirm("Точно удалить? Лучше жми «Съели» 🙂");
-    if (!ok) return;
-    const res = await apiPost({ action: "delete", user_id: USER_ID, id });
-    if (!res.ok) tg?.showAlert?.(res.error || "Ошибка удаления");
+    const res = await apiPost({ user_id: uid, action: "eat", id });
+    if (!res || !res.ok){
+      const err = res?.error ? String(res.error) : "Ошибка";
+      return (tg?.showAlert ? tg.showAlert(err) : alert(err));
+    }
     await load();
-  }
-
-  function hideSplash(msg){
-    const tiny = document.getElementById("splashTiny");
-    if (tiny && msg) tiny.textContent = msg;
-    // чуть задержки, чтобы выглядело как заставка
-    setTimeout(() => {
-      const sp = document.getElementById("splash");
-      if (sp) sp.classList.add("hide");
-    }, 450);
   }
 
   document.getElementById("addBtn").onclick = add;
   document.getElementById("reloadBtn").onclick = load;
   document.getElementById("soonBtn").onclick = () => { filterSoon = !filterSoon; load(); };
-  document.getElementById("modeChip").onclick = () => { filterSoon = !filterSoon; load(); };
 
   load();
 </script>
