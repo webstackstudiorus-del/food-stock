@@ -1,0 +1,1078 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light">
+  <title>едахуйня</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <style>
+    :root{
+      --bg:#ffffff;
+      --surface:#ffffff;
+      --card:#ffffff;
+      --muted:#6b7280;
+      --text:#0f172a;
+      --line:#e5e7eb;
+
+      --lavka:#00b8ff;
+      --lavka2:#15d17a;
+      --lavkaSoft:#eaf9ff;
+      --green:#16a34a;
+      --yellow:#f59e0b;
+      --red:#ef4444;
+
+      --shadow: 0 10px 30px rgba(15,23,42,.10);
+      --radius: 22px;
+      --radius2: 16px;
+      --safeTop: env(safe-area-inset-top);
+      --safeBottom: env(safe-area-inset-bottom);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color:var(--text);
+      background: radial-gradient(1200px 420px at 50% -120px, rgba(0,184,255,.22), transparent 60%),
+                  radial-gradient(900px 360px at 90% 0px, rgba(21,209,122,.16), transparent 55%),
+                  var(--bg);
+      -webkit-font-smoothing: antialiased;
+      overflow-x:hidden;
+    }
+
+    /* Контейнер */
+    .wrap{
+      max-width: 980px;
+      margin: 0 auto;
+      padding: calc(14px + var(--safeTop)) 14px calc(96px + var(--safeBottom)) 14px;
+    }
+
+    /* Хедер */
+    .hero{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding: 18px 18px;
+      background: linear-gradient(135deg, rgba(0,184,255,.18), rgba(21,209,122,.14));
+      border: 1px solid rgba(229,231,235,.8);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(6px);
+    }
+
+    .heroLeft{
+      display:flex; align-items:center; gap:12px; min-width:0;
+    }
+
+    .appIcon{
+      width:44px;height:44px;border-radius: 16px;
+      display:grid;place-items:center;
+      background: linear-gradient(145deg, rgba(0,184,255,.22), rgba(21,209,122,.18));
+      border: 1px solid rgba(255,255,255,.9);
+      box-shadow: 0 10px 20px rgba(0,0,0,.08);
+      flex:0 0 auto;
+    }
+    .appIcon span{font-size:22px}
+
+    .heroTitle{font-weight:800; font-size:22px; line-height:1.1; margin:0}
+    .heroSub{margin:4px 0 0 0; color:var(--muted); font-size:13.5px; line-height:1.25}
+
+    .userChip{
+      display:flex; align-items:center; gap:10px;
+      padding:10px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.85);
+      border: 1px solid rgba(229,231,235,.95);
+      box-shadow: 0 10px 20px rgba(15,23,42,.08);
+      flex:0 0 auto;
+      max-width: 45%;
+    }
+    .userChip .avatar{
+      width:28px;height:28px;border-radius:999px;
+      background: linear-gradient(135deg, rgba(0,184,255,.32), rgba(21,209,122,.28));
+      display:grid;place-items:center;
+      border: 1px solid rgba(255,255,255,.95);
+      flex:0 0 auto;
+    }
+    .userChip .name{
+      font-weight:700; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+
+    /* Табы */
+    .tabs{
+      margin-top:12px;
+      display:flex;
+      gap:10px;
+      overflow:auto;
+      padding: 2px 2px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .tab{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.85);
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-weight:700;
+      color:#334155;
+      display:flex; align-items:center; gap:8px;
+      box-shadow: 0 10px 20px rgba(15,23,42,.06);
+      cursor:pointer;
+      user-select:none;
+      white-space:nowrap;
+      transition: transform .08s ease, background .2s ease, border-color .2s ease;
+    }
+    .tab:active{transform: scale(.98)}
+    .tab.active{
+      background: linear-gradient(135deg, rgba(0,184,255,.20), rgba(21,209,122,.16));
+      border-color: rgba(0,184,255,.35);
+      color:#0f172a;
+    }
+    .tab .ico{opacity:.9}
+
+    /* Карточки */
+    .grid{
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap:14px;
+      margin-top:14px;
+    }
+    @media (max-width: 860px){
+      .grid{grid-template-columns:1fr}
+    }
+
+    .card{
+      background: rgba(255,255,255,.92);
+      border:1px solid rgba(229,231,235,.95);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .cardHead{
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(229,231,235,.9);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+    }
+    .cardHead h3{margin:0; font-size:16px; font-weight:900}
+    .cardHead .hint{color:var(--muted); font-size:12.5px}
+
+    .cardBody{padding: 14px 16px}
+
+    /* Формы */
+    label{
+      display:block;
+      font-size:12.5px;
+      color: #64748b;
+      margin: 10px 0 6px;
+      font-weight:700;
+    }
+    .row{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+    @media (max-width: 420px){ .row{grid-template-columns:1fr} }
+
+    input, select, textarea{
+      width:100%;
+      padding: 14px 14px;
+      border:1px solid rgba(229,231,235,.95);
+      border-radius: 16px;
+      font-size:16px;
+      outline:none;
+      background: #fff;
+      color:#0f172a;
+      box-shadow: 0 12px 24px rgba(15,23,42,.06);
+    }
+    textarea{min-height: 86px; resize: vertical}
+    input::placeholder, textarea::placeholder{color:#94a3b8}
+    input:focus, select:focus, textarea:focus{
+      border-color: rgba(0,184,255,.55);
+      box-shadow: 0 16px 30px rgba(0,184,255,.10);
+    }
+
+    /* Кнопки */
+    .btnRow{display:flex; gap:10px; margin-top:12px}
+    .btn{
+      flex:1;
+      border:0;
+      padding: 14px 14px;
+      border-radius: 18px;
+      font-size:16px;
+      font-weight:900;
+      cursor:pointer;
+      box-shadow: 0 14px 30px rgba(15,23,42,.10);
+      transition: transform .08s ease, filter .2s ease;
+      user-select:none;
+    }
+    .btn:active{transform: scale(.99)}
+    .btnPrimary{
+      color:#083344;
+      background: linear-gradient(135deg, rgba(0,184,255,.55), rgba(21,209,122,.38));
+    }
+    .btnGhost{
+      background: #fff;
+      border: 1px solid rgba(229,231,235,.95);
+      color:#0f172a;
+    }
+    .btnDanger{
+      background: #fff;
+      border:1px solid rgba(239,68,68,.35);
+      color:#991b1b;
+    }
+
+    /* Поиск/фильтры */
+    .chips{
+      display:flex; gap:10px; flex-wrap:wrap;
+      margin-top:12px;
+    }
+    .chip{
+      padding: 10px 14px;
+      border-radius: 999px;
+      border:1px solid rgba(229,231,235,.95);
+      background: rgba(255,255,255,.92);
+      font-weight:800;
+      cursor:pointer;
+      color:#334155;
+      box-shadow: 0 12px 24px rgba(15,23,42,.06);
+      user-select:none;
+    }
+    .chip.active{
+      background: linear-gradient(135deg, rgba(0,184,255,.20), rgba(21,209,122,.16));
+      border-color: rgba(0,184,255,.35);
+      color:#0f172a;
+    }
+
+    /* Список */
+    .list{padding: 8px 10px 14px}
+    .item{
+      margin: 10px 6px;
+      padding: 14px 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(229,231,235,.95);
+      background: rgba(255,255,255,.95);
+      box-shadow: 0 14px 28px rgba(15,23,42,.06);
+    }
+    .itemTop{
+      display:flex; justify-content:space-between; align-items:flex-start; gap:10px;
+    }
+    .itemTitle{
+      font-weight:950; font-size:16px; margin:0; line-height:1.2;
+    }
+    .itemMeta{
+      margin-top:6px; color:#475569; font-size:13px; line-height:1.35;
+    }
+    .itemMeta b{color:#0f172a}
+    .pill{
+      display:inline-flex; align-items:center; gap:6px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size:12px;
+      font-weight:900;
+      border: 1px solid rgba(229,231,235,.95);
+      white-space:nowrap;
+      background:#fff;
+    }
+    .pill.ok{border-color: rgba(22,163,74,.25); color: var(--green)}
+    .pill.soon{border-color: rgba(245,158,11,.35); color: var(--yellow)}
+    .pill.expired{border-color: rgba(239,68,68,.35); color: var(--red)}
+    .pill .dot{
+      width:8px;height:8px;border-radius:999px;background: currentColor;
+      box-shadow: 0 0 0 4px rgba(0,0,0,0.03);
+    }
+
+    .itemActions{display:flex; gap:10px; margin-top:10px}
+
+    /* Нижняя навигация */
+    .bottomNav{
+      position:fixed;
+      left:0; right:0; bottom:0;
+      padding: 10px 12px calc(10px + var(--safeBottom));
+      background: rgba(255,255,255,.92);
+      border-top:1px solid rgba(229,231,235,.95);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 -12px 24px rgba(15,23,42,.08);
+      z-index: 40;
+    }
+    .bottomNav .bar{
+      max-width: 980px; margin:0 auto;
+      display:flex; gap:10px;
+    }
+    .navBtn{
+      flex:1;
+      padding: 10px 10px;
+      border-radius: 18px;
+      border:1px solid rgba(229,231,235,.95);
+      background:#fff;
+      font-weight:900;
+      display:flex; align-items:center; justify-content:center; gap:8px;
+      cursor:pointer;
+      user-select:none;
+      box-shadow: 0 12px 24px rgba(15,23,42,.06);
+    }
+    .navBtn.active{
+      background: linear-gradient(135deg, rgba(0,184,255,.20), rgba(21,209,122,.16));
+      border-color: rgba(0,184,255,.35);
+    }
+
+    /* Splash */
+    .splash{
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(1000px 600px at 50% -200px, rgba(0,184,255,.35), transparent 60%),
+                  radial-gradient(800px 500px at 50% 0px, rgba(21,209,122,.22), transparent 55%),
+                  #ffffff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index: 999;
+      transition: opacity .28s ease;
+    }
+    .splash.hidden{opacity:0; pointer-events:none}
+    .splashCard{
+      width:min(420px, 92vw);
+      padding: 28px 22px;
+      border-radius: 28px;
+      background: rgba(255,255,255,.9);
+      border: 1px solid rgba(229,231,235,.95);
+      box-shadow: 0 24px 70px rgba(15,23,42,.14);
+      text-align:center;
+    }
+    .splashLogo{
+      width:74px;height:74px;margin:0 auto 12px;
+      border-radius: 22px;
+      background: linear-gradient(145deg, rgba(0,184,255,.26), rgba(21,209,122,.18));
+      border: 1px solid rgba(255,255,255,.95);
+      box-shadow: 0 16px 40px rgba(15,23,42,.12);
+      display:grid; place-items:center;
+      font-size:34px;
+    }
+    .splashTitle{margin:0; font-weight:1000; font-size:26px; letter-spacing:-.2px}
+    .splashSub{margin:6px 0 16px; color:var(--muted); font-weight:700}
+    .prog{
+      height: 10px;
+      width:100%;
+      background: rgba(229,231,235,.9);
+      border-radius: 999px;
+      overflow:hidden;
+      box-shadow: inset 0 2px 8px rgba(15,23,42,.06);
+    }
+    .prog > i{
+      display:block;
+      height:100%;
+      width: 30%;
+      background: linear-gradient(90deg, var(--lavka), var(--lavka2));
+      border-radius: 999px;
+      animation: load 1.1s ease-in-out infinite;
+    }
+    @keyframes load{
+      0%{transform: translateX(-120%)}
+      100%{transform: translateX(320%)}
+    }
+
+    /* Секции (для табов) */
+    .section{display:none}
+    .section.active{display:block}
+
+    .empty{
+      padding: 22px 16px;
+      color: #64748b;
+      font-weight:800;
+      text-align:center;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Splash screen -->
+  <div id="splash" class="splash">
+    <div class="splashCard">
+      <div class="splashLogo">🍽️</div>
+      <h1 class="splashTitle">едахуйня</h1>
+      <div class="splashSub">Загружаем…</div>
+      <div class="prog"><i></i></div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="hero">
+      <div class="heroLeft">
+        <div class="appIcon"><span>🍽️</span></div>
+        <div style="min-width:0">
+          <p class="heroTitle">Онлайн-склад</p>
+          <p class="heroSub">Добавляй продукты, готовь из того что есть — не выбрасывай лишнее</p>
+        </div>
+      </div>
+
+      <div class="userChip" id="userChip" style="display:none">
+        <div class="avatar">👤</div>
+        <div class="name" id="userName"></div>
+      </div>
+    </div>
+
+    <!-- Верхние табы -->
+    <div class="tabs" id="topTabs">
+      <div class="tab active" data-tab="stock"><span class="ico">🧊</span>Склад</div>
+      <div class="tab" data-tab="buy"><span class="ico">🛒</span>Покупки</div>
+      <div class="tab" data-tab="recipes"><span class="ico">🔎</span>Рецепты</div>
+      <div class="tab" data-tab="fav"><span class="ico">⭐</span>Избранное</div>
+    </div>
+
+    <!-- Контент -->
+    <div class="grid">
+      <!-- Левая: форма/контент -->
+      <div class="card">
+        <div class="cardHead">
+          <div>
+            <h3 id="sectionTitle">Склад</h3>
+            <div class="hint" id="sectionHint">Добавь продукт — и мы посчитаем “Использовать до”.</div>
+          </div>
+          <div class="hint" id="metaHint"></div>
+        </div>
+
+        <div class="cardBody">
+          <!-- СКЛАД -->
+          <div class="section active" id="sec-stock">
+            <label>Название продукта</label>
+            <input id="name" placeholder="Например: молоко" />
+
+            <div class="row">
+              <div>
+                <label>Кол-во</label>
+                <input id="qty" placeholder="Например: 1" inputmode="decimal" />
+              </div>
+              <div>
+                <label>Ед. изм.</label>
+                <select id="unit">
+                  <option value="">Авто</option>
+                  <option value="шт">шт</option>
+                  <option value="л">л</option>
+                  <option value="мл">мл</option>
+                  <option value="кг">кг</option>
+                  <option value="г">г</option>
+                  <option value="уп">уп</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="row">
+              <div>
+                <label>Категория (опц.)</label>
+                <select id="category">
+                  <option value="auto">Авто</option>
+                  <option value="dairy">Молочка</option>
+                  <option value="meat">Мясо</option>
+                  <option value="veggies">Овощи</option>
+                  <option value="fruits">Фрукты</option>
+                  <option value="bakery">Выпечка</option>
+                  <option value="ready">Готовое</option>
+                  <option value="canned">Консервы</option>
+                  <option value="other">Другое</option>
+                </select>
+              </div>
+              <div>
+                <label>Хранение</label>
+                <select id="storage">
+                  <option value="fridge">Холод</option>
+                  <option value="freezer">Мороз</option>
+                  <option value="shelf">Полка</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="row">
+              <div>
+                <label>Срок годности (с упаковки)</label>
+                <input id="expiry_date" type="date" />
+              </div>
+              <div>
+                <label>Дата вскрытия (опц.)</label>
+                <input id="opened_date" type="date" />
+              </div>
+            </div>
+
+            <div class="row">
+              <div>
+                <label>Годен после вскрытия (дней)</label>
+                <input id="opened_days" placeholder="Например: 3" inputmode="numeric" />
+              </div>
+              <div>
+                <label>Ккал на 100г (опц.)</label>
+                <input id="kcal_per_100" placeholder="Например: 60" inputmode="numeric" />
+              </div>
+            </div>
+
+            <label>Заметка (опц.)</label>
+            <textarea id="notes" placeholder="Например: открыли утром / для каши"></textarea>
+
+            <div class="btnRow">
+              <button class="btn btnPrimary" id="addBtn">Добавить</button>
+              <button class="btn btnGhost" id="soonBtn">Скоро/Просрочено</button>
+            </div>
+
+            <div style="margin-top:10px;color:var(--muted);font-size:12.5px;font-weight:700">
+              Если указал “дата вскрытия + дни”, срок “Использовать до” считается от вскрытия.
+            </div>
+
+            <div style="margin-top:14px">
+              <label>Поиск по складу</label>
+              <input id="searchStock" placeholder="Введите: молоко / яйца / рис..." />
+              <div class="chips">
+                <div class="chip active" data-filter="all">Все</div>
+                <div class="chip" data-filter="fridge">Холод</div>
+                <div class="chip" data-filter="freezer">Мороз</div>
+                <div class="chip" data-filter="shelf">Полка</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ПОКУПКИ -->
+          <div class="section" id="sec-buy">
+            <label>Что купить</label>
+            <input id="buyName" placeholder="Например: хлеб" />
+
+            <div class="row">
+              <div>
+                <label>Кол-во (опц.)</label>
+                <input id="buyQty" placeholder="Например: 1" />
+              </div>
+              <div>
+                <label>Категория (опц.)</label>
+                <select id="buyCat">
+                  <option value="auto">Авто</option>
+                  <option value="dairy">Молочка</option>
+                  <option value="meat">Мясо</option>
+                  <option value="veggies">Овощи</option>
+                  <option value="fruits">Фрукты</option>
+                  <option value="bakery">Выпечка</option>
+                  <option value="ready">Готовое</option>
+                  <option value="other">Другое</option>
+                </select>
+              </div>
+            </div>
+
+            <button class="btn btnPrimary" id="buyAddBtn" style="width:100%;margin-top:12px">Добавить в покупки</button>
+
+            <div style="margin-top:14px">
+              <label>Поиск</label>
+              <input id="buySearch" placeholder="Фильтр списка покупок" />
+            </div>
+
+            <div id="buyList" style="margin-top:12px"></div>
+          </div>
+
+          <!-- РЕЦЕПТЫ -->
+          <div class="section" id="sec-recipes">
+            <div style="color:#475569;font-weight:800;line-height:1.35">
+              Подборка рецептов под то, что есть дома. Учитываем: <b>мультиварка</b> и <b>сковородка</b>.
+            </div>
+
+            <div style="margin-top:14px">
+              <label>Поиск по рецептам</label>
+              <input id="rcSearch" placeholder="Например: курица, суп, паста..." />
+            </div>
+
+            <div class="row">
+              <div>
+                <label>Сложность</label>
+                <select id="rcDiff">
+                  <option value="any">Любая</option>
+                  <option value="easy">Легко</option>
+                  <option value="mid">Средне</option>
+                  <option value="hard">Сложно</option>
+                </select>
+              </div>
+              <div style="display:flex;align-items:end;gap:10px">
+                <button class="btn btnGhost" id="rcTipsBtn" style="flex:1">⭐ Умные подсказки</button>
+              </div>
+            </div>
+
+            <button class="btn btnPrimary" id="rcRefreshBtn" style="width:100%;margin-top:10px">Обновить подбор</button>
+
+            <div style="margin-top:10px;color:#64748b;font-weight:800;font-size:12.5px">
+              ⚠️ Здесь пока демо-экран. Когда подключим рецепты — будет реальная выдача.
+            </div>
+
+            <div class="item" style="margin-top:14px">
+              <div class="itemTop">
+                <div>
+                  <div class="itemTitle">🔎 Рисовая сковорода с горошком</div>
+                  <div class="itemMeta"><span class="pill ok"><span class="dot"></span>~680 ккал/порц</span></div>
+                </div>
+                <div class="pill soon"><span class="dot"></span>Средний</div>
+              </div>
+              <div class="itemMeta" style="margin-top:10px">
+                • 2 порции • 25 минут • Сковорода
+              </div>
+            </div>
+          </div>
+
+          <!-- ИЗБРАННОЕ -->
+          <div class="section" id="sec-fav">
+            <div style="color:#475569;font-weight:900;margin-bottom:10px">
+              Избранное (локально на устройстве — без правок бэка)
+            </div>
+
+            <div class="item">
+              <div class="itemTitle">Любимые продукты</div>
+              <div class="itemMeta">Пока пусто. В складе нажми ⭐ у продукта.</div>
+            </div>
+
+            <div class="item">
+              <div class="itemTitle">Любимые рецепты</div>
+              <div class="itemMeta">Пока пусто. В рецептах нажми ⭐.</div>
+            </div>
+
+            <div class="item">
+              <div class="itemTitle">Мини-статистика</div>
+              <div class="itemMeta" id="miniStats">Считаем…</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Правая: список склада -->
+      <div class="card">
+        <div class="cardHead">
+          <div>
+            <h3>Список</h3>
+            <div class="hint" id="listHint">Твои продукты по датам и статусам.</div>
+          </div>
+          <button class="btn btnGhost" id="reloadBtn" style="flex:0 0 auto; padding:10px 12px; border-radius: 14px; font-weight:950">
+            Обновить
+          </button>
+        </div>
+        <div class="list" id="list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Нижняя навигация (как у приложений) -->
+  <div class="bottomNav">
+    <div class="bar">
+      <div class="navBtn active" data-tab="stock">🧊 <span>Склад</span></div>
+      <div class="navBtn" data-tab="buy">🛒 <span>Покупки</span></div>
+      <div class="navBtn" data-tab="recipes">🔎 <span>Рецепты</span></div>
+      <div class="navBtn" data-tab="fav">⭐ <span>Избранное</span></div>
+    </div>
+  </div>
+
+<script>
+  // === Telegram WebApp ===
+  const tg = window.Telegram?.WebApp;
+  try{
+    if (tg) {
+      tg.ready();
+      tg.expand();
+
+      // ФОРСИМ СВЕТЛУЮ ТЕМУ ВИЗУАЛЬНО:
+      // (в большинстве клиентов Telegram эти методы работают и перекрашивают системные панели мини-аппа)
+      tg.setHeaderColor?.('#ffffff');
+      tg.setBackgroundColor?.('#ffffff');
+      tg.setBottomBarColor?.('#ffffff');
+
+      const u = tg.initDataUnsafe?.user;
+      if (u?.first_name || u?.username) {
+        document.getElementById('userChip').style.display = 'flex';
+        document.getElementById('userName').textContent = u.first_name || u.username || 'User';
+      }
+    }
+  } catch(e){}
+
+  // === ТВОЙ Apps Script API (рабочий) ===
+  const API_URL = "https://script.google.com/macros/s/AKfycby0ERJWfWkvPj_0vpP7ejlPipqfyl2jFkUcgCU00KklMbsYJHBiqXObRIzIonesDJtv/exec";
+
+  // state
+  let filterSoon = false;
+  let stockFilter = "all";
+  let stockSearch = "";
+  let cacheItems = [];
+
+  // local-only
+  const LS_BUY = "edahui_buylist_v1";
+  const LS_FAV = "edahui_fav_v1";
+
+  // helpers
+  const $ = (id) => document.getElementById(id);
+
+  function isoToRu(iso){
+    if (!iso) return "—";
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return String(iso);
+    const dd = String(d.getDate()).padStart(2,'0');
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const yy = d.getFullYear();
+    return `${dd}.${mm}.${yy}`;
+  }
+
+  function statusLabel(s){
+    if (s === "ok") return {txt:"Ок", cls:"ok"};
+    if (s === "soon") return {txt:"Скоро", cls:"soon"};
+    if (s === "expired") return {txt:"Просрочено", cls:"expired"};
+    return {txt:"", cls:""};
+  }
+
+  function esc(s){
+    return String(s ?? "").replace(/[&<>"']/g, m => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"
+    }[m]));
+  }
+
+  // API (без preflight)
+  async function apiPost(payload){
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload),
+    });
+    return await res.json();
+  }
+
+  async function apiGet(params){
+    const url = new URL(API_URL);
+    Object.entries(params || {}).forEach(([k,v]) => url.searchParams.set(k,v));
+    const res = await fetch(url.toString());
+    return await res.json();
+  }
+
+  // UI builders
+  function itemHtml(i){
+    const s = statusLabel(i.status);
+    const useBy = i.use_by_date || i.use_by || i.expiry_date || i.exp_date || "";
+    const qty = (i.qty ?? "") !== "" ? String(i.qty) : "";
+    const unit = i.unit ? String(i.unit) : "";
+    const qtyText = (qty || unit) ? `${esc(qty)}${unit ? " " + esc(unit) : ""}` : "—";
+
+    const opened = i.opened_date ? `Вскрыто: <b>${esc(isoToRu(i.opened_date))}</b>` : "";
+    const after = i.opened_days ? `После вскрытия: <b>${esc(i.opened_days)}</b> дн.` : "";
+    const note = i.notes ? `📝 ${esc(i.notes)}` : "";
+
+    const storage = i.storage ? String(i.storage) : "";
+    const storageRu = storage === "fridge" ? "Холод" : storage === "freezer" ? "Мороз" : storage === "shelf" ? "Полка" : "—";
+
+    return `
+      <div class="item">
+        <div class="itemTop">
+          <div style="min-width:0">
+            <div class="itemTitle">${esc(i.name || i.product || "Без названия")}</div>
+            <div class="itemMeta">
+              Кол-во: <b>${qtyText}</b> • Хранение: <b>${esc(storageRu)}</b>
+            </div>
+          </div>
+          ${s.txt ? `<span class="pill ${s.cls}"><span class="dot"></span>${s.txt}</span>` : ``}
+        </div>
+
+        <div class="itemMeta" style="margin-top:8px">
+          Использовать до: <b>${esc(isoToRu(useBy))}</b>
+          ${i.kcal_per_100 ? ` • ${esc(i.kcal_per_100)} ккал/100г` : ``}
+        </div>
+
+        ${(opened || after || note) ? `
+          <div class="itemMeta" style="margin-top:8px;color:#64748b">
+            ${[opened, after, note].filter(Boolean).join(" • ")}
+          </div>` : ``}
+
+        <div class="itemActions">
+          <button class="btn btnDanger" onclick="delItem('${esc(i.id)}')">Удалить</button>
+          <button class="btn btnGhost" onclick="toggleFav('${esc(i.id)}')">⭐</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function showEmpty(el, text){
+    el.innerHTML = `<div class="empty">${esc(text)}</div>`;
+  }
+
+  function setActiveTab(tab){
+    // top tabs
+    [...document.querySelectorAll(".tab")].forEach(t => t.classList.toggle("active", t.dataset.tab === tab));
+    // bottom nav
+    [...document.querySelectorAll(".navBtn")].forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
+
+    // sections
+    const map = { stock:"sec-stock", buy:"sec-buy", recipes:"sec-recipes", fav:"sec-fav" };
+    Object.values(map).forEach(id => document.getElementById(id).classList.remove("active"));
+    document.getElementById(map[tab]).classList.add("active");
+
+    // titles
+    const title = tab === "stock" ? "Склад" : tab === "buy" ? "Покупки" : tab === "recipes" ? "Рецепты" : "Избранное";
+    $("sectionTitle").textContent = title;
+
+    $("sectionHint").textContent =
+      tab === "stock" ? "Добавь продукт — и мы посчитаем “Использовать до”."
+      : tab === "buy" ? "Список покупок хранится локально на телефоне."
+      : tab === "recipes" ? "Пока демо-экран — подключим рецепты на следующем этапе."
+      : "Избранное тоже локально (пока без правок бэка).";
+
+    $("listHint").textContent =
+      tab === "stock" ? "Твои продукты по датам и статусам."
+      : tab === "buy" ? "Покупки (локально)."
+      : tab === "recipes" ? "Демо-карточки."
+      : "Избранное/статистика.";
+
+    // right list: показываем склад всегда (удобнее), но можно поменять поведение:
+    // сейчас оставим список склада (как основной), а в покупках ниже отдельный лист.
+  }
+
+  // stock filters UI
+  function setChip(filter){
+    stockFilter = filter;
+    [...document.querySelectorAll(".chip")].forEach(c => c.classList.toggle("active", c.dataset.filter === filter));
+    renderStock();
+  }
+
+  // BUY (local)
+  function loadBuy(){
+    try{ return JSON.parse(localStorage.getItem(LS_BUY) || "[]") }catch(e){ return [] }
+  }
+  function saveBuy(arr){
+    localStorage.setItem(LS_BUY, JSON.stringify(arr));
+  }
+  function renderBuy(){
+    const q = ($("buySearch").value || "").trim().toLowerCase();
+    const data = loadBuy().filter(x => !q || (x.name||"").toLowerCase().includes(q));
+    const el = $("buyList");
+    if (!data.length) return showEmpty(el, "Список покупок пуст.");
+    el.innerHTML = data.map((x, idx) => `
+      <div class="item">
+        <div class="itemTop">
+          <div>
+            <div class="itemTitle">${esc(x.name)}</div>
+            <div class="itemMeta">${x.qty ? `Кол-во: <b>${esc(x.qty)}</b>` : ""} ${x.cat ? ` • Категория: <b>${esc(x.cat)}</b>` : ""}</div>
+          </div>
+          <span class="pill ok"><span class="dot"></span>В списке</span>
+        </div>
+        <div class="itemActions">
+          <button class="btn btnDanger" onclick="buyDel(${idx})">Удалить</button>
+          <button class="btn btnGhost" onclick="buyToStock(${idx})">➡️ В склад</button>
+        </div>
+      </div>
+    `).join("");
+  }
+  window.buyDel = (idx) => {
+    const arr = loadBuy();
+    arr.splice(idx,1);
+    saveBuy(arr);
+    renderBuy();
+  }
+  window.buyToStock = async (idx) => {
+    const arr = loadBuy();
+    const it = arr[idx];
+    if (!it) return;
+    // перенесём название, остальное пусть заполнят в складе (быстро)
+    setActiveTab("stock");
+    $("name").value = it.name || "";
+    $("qty").value = it.qty || "";
+    // удалим из покупок
+    arr.splice(idx,1);
+    saveBuy(arr);
+    renderBuy();
+  }
+
+  // FAV (local)
+  function loadFav(){
+    try{ return JSON.parse(localStorage.getItem(LS_FAV) || "[]") }catch(e){ return [] }
+  }
+  function saveFav(arr){
+    localStorage.setItem(LS_FAV, JSON.stringify(arr));
+  }
+  window.toggleFav = (id) => {
+    const fav = new Set(loadFav());
+    if (fav.has(id)) fav.delete(id); else fav.add(id);
+    saveFav([...fav]);
+    // лёгкий фидбек
+    tg?.HapticFeedback?.impactOccurred?.("light");
+  }
+
+  // render stock list
+  function renderStock(){
+    let items = [...cacheItems];
+
+    // soon filter toggle
+    if (filterSoon) items = items.filter(i => i.status === "soon" || i.status === "expired");
+
+    // storage chip
+    if (stockFilter !== "all") items = items.filter(i => (i.storage || "") === stockFilter);
+
+    // search
+    if (stockSearch) {
+      const q = stockSearch.toLowerCase();
+      items = items.filter(i => (String(i.name || i.product || "")).toLowerCase().includes(q));
+    }
+
+    const el = $("list");
+    if (!items.length) return showEmpty(el, filterSoon ? "Нет срочных/просроченных." : "Пока пусто. Добавь продукт.");
+
+    el.innerHTML = items.map(itemHtml).join("");
+
+    // stats
+    const total = cacheItems.length;
+    const ok = cacheItems.filter(i => i.status === "ok").length;
+    const soon = cacheItems.filter(i => i.status === "soon").length;
+    const exp = cacheItems.filter(i => i.status === "expired").length;
+    $("miniStats").textContent = `Всего в складе: ${total} • Просрочено: ${exp} • Скоро: ${soon} • Ок: ${ok}`;
+  }
+
+  // load from backend
+  async function load(){
+    const data = await apiGet({ action: "list" });
+
+    // backend может вернуть {ok:true,items:[...]} или сразу массив — поддержим оба
+    const items = Array.isArray(data) ? data : (Array.isArray(data.items) ? data.items : []);
+
+    cacheItems = items;
+
+    // meta hint
+    if (data?.meta?.tz) {
+      $("metaHint").textContent = `TZ: ${data.meta.tz} • soon: ${data.meta.notify_soon_day}д`;
+    } else {
+      $("metaHint").textContent = "";
+    }
+
+    renderStock();
+  }
+
+  // delete
+  window.delItem = async (id) => {
+    try{
+      await apiPost({ action: "delete", id });
+      await load();
+      tg?.HapticFeedback?.notificationOccurred?.("success");
+    }catch(e){
+      tg?.showAlert?.("Не удалось удалить");
+    }
+  }
+
+  // add to backend (ВАЖНО: qty ВСЕГДА СТРОКА — микро-фикс)
+  async function add(){
+    const name = $("name").value.trim();
+    const qtyRaw = $("qty").value.trim();
+    const unit = $("unit").value.trim();
+    const category = $("category").value;
+    const storage = $("storage").value;
+
+    const expiry_date = $("expiry_date").value;  // yyyy-mm-dd
+    const opened_date = $("opened_date").value;  // yyyy-mm-dd
+    const opened_days = $("opened_days").value.trim();
+    const kcal_per_100 = $("kcal_per_100").value.trim();
+    const notes = $("notes").value.trim();
+
+    if (!name) return tg?.showAlert?.("Введите название продукта") || alert("Введите название продукта");
+    if (!expiry_date && !opened_date) return tg?.showAlert?.("Укажите срок годности или дату вскрытия") || alert("Укажите срок годности или дату вскрытия");
+
+    const added_by = tg?.initDataUnsafe?.user?.id ? String(tg.initDataUnsafe.user.id) : "";
+
+    // *** FIX: qty всегда строкой ***
+    const qty = qtyRaw ? String(qtyRaw) : "";
+
+    const payload = {
+      action: "add",
+      item: {
+        name,
+        qty,             // <- строка всегда
+        unit,
+        category,
+        storage,
+        expiry_date,
+        opened_date,
+        opened_days,
+        kcal_per_100,
+        notes,
+        added_by
+      }
+    };
+
+    try{
+      const res = await apiPost(payload);
+      if (!res?.ok) throw new Error("add failed");
+      // reset
+      $("name").value = "";
+      $("qty").value = "";
+      $("unit").value = "";
+      $("category").value = "auto";
+      $("storage").value = "fridge";
+      $("expiry_date").value = "";
+      $("opened_date").value = "";
+      $("opened_days").value = "";
+      $("kcal_per_100").value = "";
+      $("notes").value = "";
+
+      tg?.HapticFeedback?.notificationOccurred?.("success");
+      await load();
+    }catch(e){
+      tg?.showAlert?.("Ошибка добавления") || alert("Ошибка добавления");
+    }
+  }
+
+  // splash hide helper
+  function hideSplash(){
+    const sp = $("splash");
+    sp.classList.add("hidden");
+    setTimeout(() => sp.remove(), 350);
+  }
+
+  // events
+  $("addBtn").onclick = add;
+  $("reloadBtn").onclick = () => load();
+
+  $("soonBtn").onclick = () => {
+    filterSoon = !filterSoon;
+    $("soonBtn").textContent = filterSoon ? "Показать всё" : "Скоро/Просрочено";
+    renderStock();
+  };
+
+  $("searchStock").addEventListener("input", (e) => {
+    stockSearch = e.target.value.trim();
+    renderStock();
+  });
+
+  [...document.querySelectorAll(".chip")].forEach(c => c.addEventListener("click", () => setChip(c.dataset.filter)));
+
+  // tab clicks
+  [...document.querySelectorAll(".tab")].forEach(t => t.addEventListener("click", () => setActiveTab(t.dataset.tab)));
+  [...document.querySelectorAll(".navBtn")].forEach(b => b.addEventListener("click", () => setActiveTab(b.dataset.tab)));
+
+  // buy events
+  $("buyAddBtn").onclick = () => {
+    const name = $("buyName").value.trim();
+    if (!name) return tg?.showAlert?.("Введите что купить") || alert("Введите что купить");
+    const qty = $("buyQty").value.trim();
+    const cat = $("buyCat").value;
+    const arr = loadBuy();
+    arr.unshift({ name, qty, cat, at: Date.now() });
+    saveBuy(arr);
+    $("buyName").value = "";
+    $("buyQty").value = "";
+    $("buyCat").value = "auto";
+    renderBuy();
+    tg?.HapticFeedback?.impactOccurred?.("light");
+  }
+  $("buySearch").addEventListener("input", renderBuy);
+
+  // recipes demo btns
+  $("rcTipsBtn").onclick = () => tg?.showAlert?.("Пока демо 🙂 Следующий этап — подключаем рецепты.");
+  $("rcRefreshBtn").onclick = () => tg?.showAlert?.("Пока демо 🙂 Следующий этап — подключаем рецепты.");
+
+  // init
+  (async function init(){
+    // минимальная задержка, чтобы splash выглядел “как приложение”
+    const t0 = Date.now();
+    try{
+      await load();
+      renderBuy();
+      $("miniStats").textContent = "Всего в складе: 0 • Просрочено: 0 • Скоро: 0 • Ок: 0";
+    }catch(e){
+      // если API упал — всё равно покажем UI
+      showEmpty($("list"), "Не удалось загрузить склад. Проверь API.");
+    }finally{
+      const dt = Date.now() - t0;
+      const min = 700;
+      setTimeout(hideSplash, Math.max(0, min - dt));
+    }
+  })();
+</script>
+</body>
+</html>
